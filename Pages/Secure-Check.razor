@@ -1,0 +1,15 @@
+﻿@page "/Secure-Check"
+@using Microsoft.AspNetCore.Components.Authorization
+
+<h3>Secure_Check</h3>
+
+<AuthorizeView>
+	<Authorized>
+		<h3>Welcome Authorized User !😊</h3>
+		<p>Only You have access to see this Secure Content</p>
+	</Authorized>
+	<NotAuthorized>
+		<h3>Sorry You  must login  to  see this content</h3>
+        <p>Login to  access the page</p> 
+	</NotAuthorized>
+ </AuthorizeView>

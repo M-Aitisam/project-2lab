@@ -1,0 +1,23 @@
+﻿@page "/UserStatus-Check"
+@using Microsoft.AspNetCore.Components.Authorization 
+@* this namespace  is required for handling authentication and authorization in Blazor. *@
+
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>UserStatus</h3>
+
+<p> <b>Current User </b> : @username</p>
+@code {
+	private string? username ;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var authstate = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+	
+		// It increases the current authentication state asynchronously.
+		var user = authstate.User;
+		username = user.Identity?.IsAuthenticated == true ? user.Identity.Name ??"Unknown User" : "Not Logged in ";
+	
+	}
+}

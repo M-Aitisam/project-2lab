@@ -1,0 +1,39 @@
+﻿@page "/Admin-Check"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<IdentityUser> UserManager
+@using Microsoft.AspNetCore.Identity
+
+<AuthorizeView>
+    <Authorized>
+         <h3>Welcome, Admin! 😊</h3>
+         <p>You have administrative access to this page.</p>
+       
+    </Authorized>
+    <NotAuthorized>
+        <h3>Not Authorized</h3>
+        <p>You must log in to view this page.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private bool isAdmin = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Check if the user is authenticated
+        if (user.Identity?.IsAuthenticated == true && user.Identity.Name != null)
+        {
+            // Find the user in the database
+            var identityUser = await UserManager.FindByNameAsync(user.Identity.Name);
+            if (identityUser != null)
+            {
+                // Check if the user has the Admin role
+                isAdmin = await UserManager.IsInRoleAsync(identityUser, "Admin");
+            }
+        }
+    }
+}
