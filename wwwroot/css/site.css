@@ -132,3 +132,102 @@ h4 {
 }
 
 /*Dashboard Css End*/
+/*Announcement Css Start*/
+.announcement-board {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+.announcement-title {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.post-announcement {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.announcement-input {
+    flex-grow: 1;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.post-btn {
+    padding: 8px 12px;
+    font-size: 1rem;
+}
+
+.announcement-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.announcement-item {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+    .announcement-item.unread {
+        background-color: #fff8c6;
+    }
+
+    .announcement-item.read {
+        background-color: #d4edda;
+    }
+
+.announcement-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.announcement-message {
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.announcement-timestamp {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.mark-btn {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+}
+
+/*Announcement Css End*/
+
+
+.login-form {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 300px;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+}
+    

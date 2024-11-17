@@ -11,11 +11,13 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 //builder.Services.AddSingleton<NotificationService>();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddSingleton<AuthenticationService>();
+builder.Services.AddSingleton<AnnouncementService>();
+
 
 // Add default identity and roles
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
@@ -32,7 +34,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSignalR();  // Add SignalR services
-builder.Services.AddSingleton<AnnouncementService>();
+
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 
 // Authorization for roles
