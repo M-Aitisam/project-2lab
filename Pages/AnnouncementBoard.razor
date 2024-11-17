@@ -1,0 +1,97 @@
+﻿@page "/announcement"
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject project_2lab.Data.AnnouncementService AnnouncementService
+<h3>Announcement Board</h3>
+
+@if (isAdmin)
+{
+    <!-- Admin: Post Announcement -->
+    <div>
+        <input @bind="newAnnouncementMessage" placeholder="Enter new announcement" />
+        <button @onclick="PostAnnouncement">Post Announcement</button>
+    </div>
+}
+
+<!-- Display Announcements -->
+<ul>
+    @foreach (var announcement in announcements)
+    {
+        <li style="background-color: @(announcement.IsRead ? "lightgreen" : "lightyellow")">
+            @announcement.Message
+            <span>@announcement.Timestamp.ToString("HH:mm:ss")</span>
+            @if (!announcement.IsRead && !isAdmin)
+            {
+                <button @onclick="() => MarkAsRead(announcement)">Mark as Read</button>
+            }
+        </li>
+    }
+</ul>
+
+@code {
+    private List<Announcement> announcements = new List<Announcement>();  // Use Announcement, not AnnouncementService
+    private string? newAnnouncementMessage;
+    private bool isAdmin = false;
+    private System.Timers.Timer ? announcementTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if the user is an Admin
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        isAdmin = user.IsInRole("Admin");
+
+        // Load announcements from service
+        announcements = await AnnouncementService.GetAnnouncementsAsync();
+
+        // Simulate real-time updates using a timer (every 5 seconds)
+        announcementTimer = new System.Timers.Timer(5000);
+        announcementTimer.Elapsed += (sender, args) => GenerateFakeAnnouncement();
+        announcementTimer.Start();
+    }
+
+    private void GenerateFakeAnnouncement()
+    {
+        var newAnnouncement = new Announcement // Use Announcement, not AnnouncementService
+            {
+                Message = "New Announcement: " + DateTime.Now.ToString("HH:mm:ss"),
+                Timestamp = DateTime.Now,
+                IsRead = false
+            };
+
+        announcements.Insert(0, newAnnouncement);
+        InvokeAsync(StateHasChanged); // Refresh the UI
+    }
+
+    private async Task PostAnnouncement()
+    {
+        if (!string.IsNullOrWhiteSpace(newAnnouncementMessage))
+        {
+            var announcement = new Announcement // Use Announcement, not AnnouncementService
+                {
+                    Message = newAnnouncementMessage,
+                    Timestamp = DateTime.Now,
+                    IsRead = false
+                };
+
+            // Post the announcement to the service
+            await AnnouncementService.AddAnnouncementAsync(announcement);
+
+            // Update the list of announcements locally
+            announcements.Insert(0, announcement);
+            newAnnouncementMessage = string.Empty;
+        }
+    }
+
+    private void MarkAsRead(Announcement announcement) // Use Announcement, not AnnouncementService
+    {
+        announcement.IsRead = true;
+    }
+
+    public void Dispose()
+    {
+        // Stop the timer to avoid memory leaks
+        announcementTimer?.Stop();
+        announcementTimer?.Dispose();
+    }
+}
