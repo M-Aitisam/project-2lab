@@ -1,6 +1,7 @@
 ﻿@page "/announcement"
 @inject AuthenticationService AuthService
 @inject project_2lab.Data.AnnouncementService AnnouncementService
+@implements IAsyncDisposable
 
 <div class="announcement-board">
     @if (!AuthService.IsAuthenticated)
@@ -11,9 +12,10 @@
             <input type="email" @bind="email" placeholder="Email" />
             <input type="password" @bind="password" placeholder="Password" />
             <button class="btn btn-primary" @onclick="Login">Login</button>
+
             @if (loginFailed)
             {
-                <p class="error-message">Invalid email or password.</p>
+                <p class="error-message">Invalid email or password. Please try again.</p>
             }
         </div>
     }
@@ -21,7 +23,7 @@
     {
         <h3 class="announcement-title">Announcement Board</h3>
 
-        @if (AuthService.IsAdmin)
+        @if (isAdmin)
         {
             <!-- Admin: Post Announcement -->
             <div class="post-announcement">
@@ -43,13 +45,14 @@
                         <span class="announcement-message">@announcement.Message</span>
                         <span class="announcement-timestamp">@announcement.Timestamp.ToString("HH:mm:ss")</span>
                     </div>
-                    @if (!announcement.IsRead && !AuthService.IsAdmin)
+                    @if (!announcement.IsRead && !isAdmin)
                     {
                         <button class="btn btn-secondary mark-btn" @onclick="() => MarkAsRead(announcement)">Mark as Read</button>
                     }
                 </li>
             }
         </ul>
+
         <button class="btn btn-secondary" @onclick="Logout">Logout</button>
     }
 </div>
@@ -61,12 +64,27 @@
     private string password = string.Empty;
     private bool loginFailed = false;
     private bool isDuplicate = false;
+    private bool isAdmin = false; // Local flag to track admin status
+    private Timer _announcementTimer;
 
     protected override async Task OnInitializedAsync()
     {
         announcements = (await AnnouncementService.GetAnnouncementsAsync())
                         .DistinctBy(a => a.Message)
                         .ToList();
+
+        // Simulate real-time announcement updates every 5 seconds
+        _announcementTimer = new Timer(async _ => await LoadNewAnnouncements(), null, 0, 5000);
+    }
+
+    private async Task LoadNewAnnouncements()
+    {
+        var newAnnouncements = await AnnouncementService.GetAnnouncementsAsync();
+        foreach (var announcement in newAnnouncements.Where(a => !announcements.Contains(a)))
+        {
+            announcements.Insert(0, announcement);
+        }
+        await InvokeAsync(StateHasChanged); // Refresh UI
     }
 
     private async Task PostAnnouncement()
@@ -102,10 +120,29 @@
 
     private async Task Login()
     {
+        // Check if the login credentials are for the admin user
+        if (email == "aitisam@gmail.com" && password == "Aitisam@1234")
+        {
+            isAdmin = true; // Set admin flag locally
+        }
+        else if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            loginFailed = true;
+            isAdmin = false;
+            return;
+        }
+        else
+        {
+            isAdmin = false; // Regular user login
+        }
+
         var success = await AuthService.LoginAsync(email, password);
         if (!success)
         {
             loginFailed = true;
+            // Reset the failed login message after 5 seconds
+            await Task.Delay(5000);
+            loginFailed = false;
         }
         else
         {
@@ -113,6 +150,19 @@
             announcements = (await AnnouncementService.GetAnnouncementsAsync())
                             .DistinctBy(a => a.Message)
                             .ToList();
+            // Notify the user with new announcements one by one
+            await ShowNewAnnouncements();
+        }
+    }
+
+    private async Task ShowNewAnnouncements()
+    {
+        foreach (var announcement in announcements)
+        {
+            // Wait for 1 second before showing each new announcement
+            await Task.Delay(1000);
+            announcement.IsRead = false; // Mark it as unread when showing
+            StateHasChanged(); // Refresh UI to show the latest update
         }
     }
 
@@ -122,5 +172,11 @@
         email = string.Empty;
         password = string.Empty;
         announcements.Clear();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Dispose of the timer when the component is disposed
+        _announcementTimer?.Dispose();
     }
 }
