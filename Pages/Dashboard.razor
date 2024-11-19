@@ -1,1 +1,73 @@
-﻿
+﻿@page "/dashboard"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3 class="dashboard-header">Welcome to Aitisam in Real-Time-Notifications</h3>
+
+<AuthorizeView Roles="Manager">
+    <Authorized>
+        <div class="notifications-container">
+            @foreach (var category in GroupedNotifications)
+            {
+                <div class="notification-category">
+                    <h5>@category.Key</h5>
+                    <ul>
+                        @foreach (var notification in category.Value)
+                        {
+                            <li class="notification-item">@notification</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+        <button @onclick="ClearNotifications" class="btn btn-danger clear-btn">Clear Notifications</button>
+    </Authorized>
+    <NotAuthorized>
+        <h4>Summary</h4>
+        <p class="unauthorized-message">You have no right to access this page. Real-time notifications are not available for non-manager users.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private Dictionary<string, List<string>> GroupedNotifications { get; set; } = new();
+    private System.Timers.Timer? NotificationTimer;
+
+    protected override void OnInitialized()
+    {
+        // Initialize grouped notifications
+        GroupedNotifications["General"] = new List<string>();
+        GroupedNotifications["System Updates"] = new List<string>();
+
+        // Initialize the timer for notifications
+        NotificationTimer = new System.Timers.Timer(5000); // 5 seconds interval
+        NotificationTimer.Elapsed += AddNotification;
+        NotificationTimer.AutoReset = true;
+        NotificationTimer.Start();
+    }
+
+    private void AddNotification(object? source, System.Timers.ElapsedEventArgs e)
+    {
+        // Add a new notification specifically to the "System Updates" category
+        InvokeAsync(() =>
+        {
+            GroupedNotifications["System Updates"].Add($"New System Update at {DateTime.Now:T}");
+            GroupedNotifications["General"].Add($"New General Update at {DateTime.Now:T}");
+            StateHasChanged(); // Update the UI
+        });
+    }
+
+
+    private void ClearNotifications()
+    {
+        foreach (var category in GroupedNotifications.Keys.ToList())
+        {
+            GroupedNotifications[category].Clear();
+        }
+    }
+
+    public void Dispose()
+    {
+        // Clean up the timer
+        NotificationTimer?.Dispose();
+    }
+}

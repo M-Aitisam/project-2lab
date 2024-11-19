@@ -69,66 +69,75 @@ a, .btn-link {
 
 
 /*Dashboard Css Start*/
+/* Dashboard Styling */
 .dashboard-header {
-    text-align: center;
     font-size: 2rem;
-    margin-top: 20px;
-    color: #4a90e2;
+    font-weight: bold;
+    color: #4CAF50; /* Green theme for the dashboard header */
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-.manager-view, .non-manager-view {
-    margin: 20px auto;
-    padding: 20px;
+.notifications-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.notification-category {
+    flex: 1 1 300px; /* Responsive layout */
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f7f7f7;
-    max-width: 600px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.notification-area {
-    margin-top: 15px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    padding: 10px;
     background-color: #fff;
-    max-height: 200px;
-    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-    .notification-area ul {
-        list-style: none;
-        padding: 0;
+    .notification-category h5 {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
     }
 
-    .notification-area li {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-        font-size: 0.9rem;
-    }
-
-        .notification-area li:last-child {
-            border-bottom: none;
-        }
-
-.clear-btn {
-    margin-top: 10px;
-    display: inline-block;
-}
-
-.non-manager-view ul {
+.notification-item {
     list-style: none;
-    padding: 0;
+    padding: 5px;
+    margin: 5px 0;
+    background-color: #e8f5e9;
+    border-radius: 5px;
+    border: 1px solid #c8e6c9;
+    color: #2e7d32;
 }
 
-.non-manager-view li {
-    margin-bottom: 10px;
+.btn.clear-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
     font-size: 1rem;
-    color: #555;
+    border: none;
+    border-radius: 5px;
+    background-color: #f44336; /* Red for clear button */
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-h4 {
-    color: #333;
+    .btn.clear-btn:hover {
+        background-color: #d32f2f; /* Darker red on hover */
+    }
+
+.unauthorized-message {
+    font-size: 1rem;
+    color: #ff5722; /* Orange message for unauthorized users */
+    padding: 10px;
+    border: 1px solid #ffc107;
+    background-color: #fff3e0;
+    border-radius: 5px;
+    text-align: center;
 }
 
 /*Dashboard Css End*/
